@@ -86,7 +86,7 @@ ProcessScheduler::SelectNextReadyThread ()
 {
     //int key = -9;
     NachOSThread* nextThread = (NachOSThread *)listOfReadyThreads->SortedRemove(NULL);
-    //DEBUG('s', "Selecting thread \"%s\" with key %d\n", nextThread->getName(), key);
+    //DEBUG('n', "Selecting thread \"%s\"\n", nextThread->getName());
     return nextThread;
 }
 
