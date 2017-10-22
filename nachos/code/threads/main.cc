@@ -143,7 +143,7 @@ main(int argc, char **argv)
 
                 char* jobs[count];
                 int priority[count];
-                NachOSThread* Threads[count]; 
+                NachOSThread* Threads; 
 
                 for (int i = 0, ptr = 0; i < count && ptr < length; i++) {
                     jobs[i] = new char[length/count];
@@ -166,20 +166,17 @@ main(int argc, char **argv)
                     }
                     printf("%d\n", priority[i]);
                     executable = fileSystem->Open(jobs[i]);
-                    ProcessAddressSpace *space;
 
                     if (executable == NULL) {
                         printf("Unable to open file %s\n", jobs[i]);
                     }
                     else{
-                        Threads[i] = new NachOSThread(jobs[i]);
-                        space = new ProcessAddressSpace(executable);    
-                        Threads[i]->space = space;
-                        space->InitUserModeCPURegisters();		// set the initial register values
-                        space->RestoreContextOnSwitch();		// load page table register
-                        Threads[i]->CreateThreadStack (ThreadStartFunction, 0);     // Make it ready for a later context switch
-                        Threads[i]->Schedule ();
-                        delete space;
+                        Threads = new NachOSThread(jobs[i]);
+                        Threads->space = new ProcessAddressSpace(executable);
+                        Threads->space->InitUserModeCPURegisters();		// set the initial register values
+                        Threads->SaveUserState();
+                        Threads->CreateThreadStack (ThreadStartFunction, 0);     // Make it ready for a later context switch
+                        Threads->Schedule ();
                     }
                 }
             }
