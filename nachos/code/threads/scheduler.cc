@@ -65,7 +65,12 @@ ProcessScheduler::MoveThreadToReadyQueue (NachOSThread *thread)
 
     thread->setStatus(READY);
     thread->waitSnapshot = stats->totalTicks;
-    listOfReadyThreads->SortedInsert((void *)thread, thread->priority);
+    if (scheduler->algo == 2) {
+        listOfReadyThreads->SortedInsert((void *)thread, thread->avgBurst);
+    }
+    else{
+        listOfReadyThreads->SortedInsert((void *)thread, thread->priority);
+    }
 }
 
 //----------------------------------------------------------------------
@@ -79,7 +84,10 @@ ProcessScheduler::MoveThreadToReadyQueue (NachOSThread *thread)
 NachOSThread *
 ProcessScheduler::SelectNextReadyThread ()
 {
-    return (NachOSThread *)listOfReadyThreads->SortedRemove(NULL);
+    //int key = -9;
+    NachOSThread* nextThread = (NachOSThread *)listOfReadyThreads->SortedRemove(NULL);
+    //DEBUG('s', "Selecting thread \"%s\" with key %d\n", nextThread->getName(), key);
+    return nextThread;
 }
 
 //----------------------------------------------------------------------
