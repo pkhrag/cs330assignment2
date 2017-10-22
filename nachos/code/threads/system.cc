@@ -77,7 +77,8 @@ TimerInterruptHandler(int dummy)
            delete ptr;
         }
         //printf("[%d] Timer interrupt.\n", stats->totalTicks);
-        interrupt->YieldOnReturn();
+        if(scheduler->algo == 3 || scheduler->algo == 4)
+            interrupt->YieldOnReturn();
     }
 }
 

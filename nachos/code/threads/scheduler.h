@@ -29,6 +29,7 @@ class ProcessScheduler {
     void Print();			// Print contents of ready list
     
     void Tail();                        // Used by fork()
+    int algo;
 
   private:
     List *listOfReadyThreads;  		// queue of threads that are ready to run,
