@@ -83,7 +83,7 @@ class NachOSThread {
     int machineState[MachineStateSize];  // all registers except for stackTop
 
   public:
-    NachOSThread(char* debugName);		// initialize a Thread 
+    NachOSThread(char* debugName, int priority = 0);		// initialize a Thread 
     ~NachOSThread(); 				// deallocate a Thread
 					// NOTE -- thread being deleted
 					// must not be running when delete 
@@ -143,6 +143,7 @@ class NachOSThread {
 					// (If NULL, don't deallocate stack)
     ThreadStatus status;		// ready, running or blocked
     char* name;
+    int priority;
 
     int pid, ppid;			// My pid and my parent's pid
 

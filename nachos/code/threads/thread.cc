@@ -32,7 +32,7 @@
 //	"threadName" is an arbitrary string, useful for debugging.
 //----------------------------------------------------------------------
 
-NachOSThread::NachOSThread(char* threadName)
+NachOSThread::NachOSThread(char* threadName, int prior)
 {
     int i;
 
@@ -40,6 +40,7 @@ NachOSThread::NachOSThread(char* threadName)
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
+    priority = prior;
 #ifdef USER_PROGRAM
     space = NULL;
     stateRestored = true;

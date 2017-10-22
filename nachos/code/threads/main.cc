@@ -59,6 +59,7 @@
 extern void ThreadTest(void), Copy(char *unixFile, char *nachosFile);
 extern void Print(char *file), PerformanceTest(void);
 extern void LaunchUserProcess(char *file), ConsoleTest(char *in, char *out);
+extern void ThreadStartFunction(int dummy);
 extern void MailTest(int networkID);
 
 //----------------------------------------------------------------------
@@ -75,12 +76,6 @@ extern void MailTest(int networkID);
 //		ex: "nachos -d +" -> argv = {"nachos", "-d", "+"}
 //----------------------------------------------------------------------
 
-void
-ThreadStartFunction (int dummy)
-{
-   currentThread->Startup();
-   machine->Run();
-}
 
 int
 main(int argc, char **argv)
@@ -164,7 +159,6 @@ main(int argc, char **argv)
                         }
                         ptr++;
                     }
-                    delete jobs;
                     printf("%d\n", priority);
                     executable = fileSystem->Open(jobs);
 
@@ -172,7 +166,7 @@ main(int argc, char **argv)
                         printf("Unable to open file %s\n", jobs);
                     }
                     else{
-                        Threads = new NachOSThread(jobs);
+                        Threads = new NachOSThread(jobs, priority);
                         Threads->space = new ProcessAddressSpace(executable);
                         Threads->space->InitUserModeCPURegisters();		// set the initial register values
                         Threads->SaveUserState();
@@ -181,10 +175,9 @@ main(int argc, char **argv)
                         delete executable;
                     }
                 }
+                delete jobs;
                 delete buffer;
             }
-            scheduler->Print();
-            printf("chutiya\n");
         }
 #endif // USER_PROGRAM
 #ifdef FILESYS

@@ -44,6 +44,13 @@ LaunchUserProcess(char *filename)
 					// by doing the syscall "exit"
 }
 
+void
+ThreadStartFunction (int dummy)
+{
+   currentThread->Startup();
+   machine->Run();
+}
+
 // Data structures needed for the console test.  Threads making
 // I/O requests wait on a Semaphore to delay until the I/O completes.
 
