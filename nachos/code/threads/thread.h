@@ -139,6 +139,8 @@ class NachOSThread {
     unsigned int burstSnapshot;
     unsigned int CPUBurst;
     unsigned int totalWait;
+    float avgBurst;
+    float lastAvgBurst;
 
   private:
     // some of the private data for this class is listed above

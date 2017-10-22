@@ -177,7 +177,9 @@ main(int argc, char **argv)
                         printf("Unable to open file %s\n", jobs);
                     }
                     else{
-                        Threads = new NachOSThread(jobs, priority);
+                        char* name = new char[100];
+                        sprintf(name, "%s-%d\0", jobs, i);
+                        Threads = new NachOSThread(name, priority);
                         Threads->space = new ProcessAddressSpace(executable);
                         Threads->space->InitUserModeCPURegisters();		// set the initial register values
                         Threads->SaveUserState();

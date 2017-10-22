@@ -46,6 +46,8 @@ NachOSThread::NachOSThread(char* threadName, int prior)
     burstSnapshot = 0;
     waitSnapshot = 0;
     scheduler->totalThreads++;
+    lastAvgBurst = 0.0;
+    avgBurst = 0.0;
 #ifdef USER_PROGRAM
     space = NULL;
     stateRestored = true;
@@ -236,6 +238,11 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
     if (currentThread->CPUBurst > scheduler->maxBurst) {
         scheduler->maxBurst = currentThread->CPUBurst;
     }
+
+    currentThread->lastAvgBurst = currentThread->avgBurst;
+    currentThread->avgBurst = ((float)currentThread->CPUBurst)*0.5 + 0.5*currentThread->lastAvgBurst;
+    DEBUG('s', "Exiting thread \"%s\" average burst \"%f\"\n", getName(), currentThread->avgBurst);
+
     status = BLOCKED;
 
     // Set exit code in parent's structure provided the parent hasn't exited
@@ -298,6 +305,9 @@ NachOSThread::YieldCPU ()
     if (currentThread->CPUBurst > scheduler->maxBurst) {
         scheduler->maxBurst = currentThread->CPUBurst;
     }
+    currentThread->lastAvgBurst = currentThread->avgBurst;
+    currentThread->avgBurst = ((float)currentThread->CPUBurst)*0.5 + 0.5*currentThread->lastAvgBurst;
+    DEBUG('s', "Yielding thread \"%s\" average burst \"%f\"\n", getName(), currentThread->avgBurst);
 
     if (nextThread != NULL) {
         scheduler->MoveThreadToReadyQueue(this);
@@ -345,6 +355,9 @@ NachOSThread::PutThreadToSleep ()
     if (currentThread->CPUBurst > scheduler->maxBurst) {
         scheduler->maxBurst = currentThread->CPUBurst;
     }
+    currentThread->lastAvgBurst = currentThread->avgBurst;
+    currentThread->avgBurst = ((float)currentThread->CPUBurst)*0.5 + 0.5*currentThread->lastAvgBurst;
+    DEBUG('s', "Sleeping thread \"%s\" average burst \"%f\"\n", getName(), currentThread->avgBurst);
 
     status = BLOCKED;
     while ((nextThread = scheduler->SelectNextReadyThread()) == NULL)
