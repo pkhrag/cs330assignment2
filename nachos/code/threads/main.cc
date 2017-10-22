@@ -130,17 +130,28 @@ main(int argc, char **argv)
                 buffer = new char[length];
                 if ((amountRead = openFile->Read(buffer, length)) <= 0)
                     printf("Read: unable to read file\n");
-                int count = 1;
+                int count = 0;
                 for (int i = 0; i < length; i++) {
                     if(buffer[i] == '\n')
                         count++;
                 }
+                
+                int algo=0;
 
                 char* jobs;
                 int priority;
+                int ptr = 0;
                 NachOSThread* Threads; 
+                while(buffer[ptr] != '\n'){
+                    algo *= 10;
+                    algo += buffer[ptr]-'0';
+                    ptr++;
+                }
 
-                for (int i = 0, ptr = 0; i < count && ptr < length; i++) {
+                printf("algo num: %d\n", algo);
+                scheduler->algo = algo;
+                ptr++;
+                for (int i = 0; i < count && ptr < length; i++) {
                     jobs = new char[100];
                     sscanf(buffer + ptr, "%s", jobs);
                     printf("%s ", jobs);
