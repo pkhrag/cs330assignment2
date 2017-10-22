@@ -41,6 +41,10 @@ NachOSThread::NachOSThread(char* threadName, int prior)
     stack = NULL;
     status = JUST_CREATED;
     priority = prior;
+    totalBurst = 0;
+    totalWait = 0;
+    burstSnapshot = 0;
+    waitSnapshot = 0;
 #ifdef USER_PROGRAM
     space = NULL;
     stateRestored = true;
@@ -220,6 +224,8 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
     threadToBeDestroyed = currentThread;
 
     NachOSThread *nextThread;
+    currentThread->totalBurst = stats->totalTicks - currentThread->burstSnapshot;
+    scheduler->busyTime += currentThread->totalBurst;
 
     status = BLOCKED;
 
@@ -273,8 +279,10 @@ NachOSThread::YieldCPU ()
     
     nextThread = scheduler->SelectNextReadyThread();
     if (nextThread != NULL) {
-	scheduler->MoveThreadToReadyQueue(this);
-	scheduler->ScheduleThread(nextThread);
+        currentThread->totalBurst = stats->totalTicks - currentThread->burstSnapshot;
+        scheduler->busyTime += currentThread->totalBurst;
+        scheduler->MoveThreadToReadyQueue(this);
+        scheduler->ScheduleThread(nextThread);
     }
     (void) interrupt->SetLevel(oldLevel);
 }
@@ -307,6 +315,8 @@ NachOSThread::PutThreadToSleep ()
     ASSERT(interrupt->getLevel() == IntOff);
     
     DEBUG('t', "Sleeping thread \"%s\" with pid %d\n", getName(), pid);
+    currentThread->totalBurst = stats->totalTicks - currentThread->burstSnapshot;
+    scheduler->busyTime += currentThread->totalBurst;
 
     status = BLOCKED;
     while ((nextThread = scheduler->SelectNextReadyThread()) == NULL)

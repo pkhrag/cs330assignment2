@@ -31,6 +31,8 @@ ProcessScheduler::ProcessScheduler()
 { 
     listOfReadyThreads = new List; 
     algo = 1;
+    busyTime = 0;
+    totalWaiting = 0;
 } 
 
 //----------------------------------------------------------------------
@@ -57,6 +59,7 @@ ProcessScheduler::MoveThreadToReadyQueue (NachOSThread *thread)
     DEBUG('t', "Putting thread %s with PID %d on ready list.\n", thread->getName(), thread->GetPID());
 
     thread->setStatus(READY);
+    thread->waitSnapshot = stats->totalTicks;
     listOfReadyThreads->SortedInsert((void *)thread, thread->priority);
 }
 
@@ -104,7 +107,10 @@ ProcessScheduler::ScheduleThread (NachOSThread *nextThread)
 					    // had an undetected stack overflow
 
     currentThread = nextThread;		    // switch to the next thread
+    currentThread->totalWait += stats->totalTicks - currentThread->waitSnapshot;
+    scheduler->totalWaiting += stats->totalTicks - currentThread->waitSnapshot;
     currentThread->setStatus(RUNNING);      // nextThread is now running
+    currentThread->burstSnapshot = stats->totalTicks;
     
     DEBUG('t', "Switching from thread \"%s\" with pid %d to thread \"%s\" with pid %d\n",
 	  oldThread->getName(), oldThread->GetPID(), nextThread->getName(), nextThread->GetPID());

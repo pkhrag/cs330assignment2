@@ -198,6 +198,10 @@ void
 Cleanup()
 {
     printf("\nCleaning up...\n");
+    printf("\n-----------------------------------\n");
+    printf("Total CPU busy time: %d\n", scheduler->busyTime);
+    printf("Total waiting time: %d\n", scheduler->totalWaiting);
+    printf("Total execution time: %d\n", stats->totalTicks);
 #ifdef NETWORK
     delete postOffice;
 #endif
