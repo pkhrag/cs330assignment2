@@ -30,6 +30,7 @@
 ProcessScheduler::ProcessScheduler()
 { 
     listOfReadyThreads = new List; 
+    algo = 1;
 } 
 
 //----------------------------------------------------------------------
