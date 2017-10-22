@@ -21,6 +21,7 @@
 #include "copyright.h"
 #include "scheduler.h"
 #include "system.h"
+#include "limits.h"
 
 //----------------------------------------------------------------------
 // ProcessScheduler::ProcessScheduler
@@ -33,6 +34,10 @@ ProcessScheduler::ProcessScheduler()
     algo = 1;
     busyTime = 0;
     totalWaiting = 0;
+    totalThreads = 0;
+    maxBurst = 0;
+    minBurst = INT_MAX;
+    nonZeroBurst = 0;
 } 
 
 //----------------------------------------------------------------------

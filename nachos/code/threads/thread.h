@@ -137,7 +137,7 @@ class NachOSThread {
     int priority;
     unsigned int waitSnapshot;
     unsigned int burstSnapshot;
-    unsigned int totalBurst;
+    unsigned int CPUBurst;
     unsigned int totalWait;
 
   private:
