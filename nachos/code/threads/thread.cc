@@ -287,19 +287,19 @@ NachOSThread::YieldCPU ()
     DEBUG('t', "Yielding thread \"%s\" with pid %d\n", getName(), pid);
     
     nextThread = scheduler->SelectNextReadyThread();
-    if (nextThread != NULL) {
-        currentThread->CPUBurst = stats->totalTicks - currentThread->burstSnapshot;
-        scheduler->busyTime += currentThread->CPUBurst;
-        if (currentThread->CPUBurst != 0) {
-            scheduler->nonZeroBurst++;
-            if (currentThread->CPUBurst < scheduler->minBurst) {
-                scheduler->minBurst = currentThread->CPUBurst;
-            }
+    currentThread->CPUBurst = stats->totalTicks - currentThread->burstSnapshot;
+    scheduler->busyTime += currentThread->CPUBurst;
+    if (currentThread->CPUBurst != 0) {
+        scheduler->nonZeroBurst++;
+        if (currentThread->CPUBurst < scheduler->minBurst) {
+            scheduler->minBurst = currentThread->CPUBurst;
         }
-        if (currentThread->CPUBurst > scheduler->maxBurst) {
-            scheduler->maxBurst = currentThread->CPUBurst;
-        }
+    }
+    if (currentThread->CPUBurst > scheduler->maxBurst) {
+        scheduler->maxBurst = currentThread->CPUBurst;
+    }
 
+    if (nextThread != NULL) {
         scheduler->MoveThreadToReadyQueue(this);
         scheduler->ScheduleThread(nextThread);
     }
