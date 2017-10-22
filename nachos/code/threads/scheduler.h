@@ -30,6 +30,12 @@ class ProcessScheduler {
     
     void Tail();                        // Used by fork()
     int algo;
+    int totalThreads;
+    int busyTime;
+    int totalWaiting;
+    int maxBurst;
+    int minBurst;
+    int nonZeroBurst;
 
   private:
     List *listOfReadyThreads;  		// queue of threads that are ready to run,

@@ -135,6 +135,10 @@ class NachOSThread {
     void IncInstructionCount();
     unsigned GetInstructionCount();
     int priority;
+    unsigned int waitSnapshot;
+    unsigned int burstSnapshot;
+    unsigned int CPUBurst;
+    unsigned int totalWait;
 
   private:
     // some of the private data for this class is listed above

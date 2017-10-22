@@ -198,6 +198,17 @@ void
 Cleanup()
 {
     printf("\nCleaning up...\n");
+    printf("\n-----------------------------------\n");
+    printf("Total CPU busy time: %d\n", scheduler->busyTime);
+    printf("Total waiting time: %d\n", scheduler->totalWaiting);
+    printf("Total execution time: %d\n", stats->totalTicks);
+    printf("CPU utilization: %f\n", (scheduler->busyTime*1.0)/stats->totalTicks);
+    printf("Max CPU burst: %d\n", scheduler->maxBurst);
+    printf("Min CPU burst: %d\n", scheduler->minBurst);
+    printf("Total number of threads: %d\n", scheduler->totalThreads);
+    printf("Total number of non-zero bursts: %d\n", scheduler->nonZeroBurst);
+    printf("Average CPU burst: %f\n", (scheduler->busyTime*1.0)/scheduler->nonZeroBurst);
+    printf("Average waiting time: %f\n", (scheduler->totalWaiting*1.0)/scheduler->totalThreads);
 #ifdef NETWORK
     delete postOffice;
 #endif

@@ -41,6 +41,11 @@ NachOSThread::NachOSThread(char* threadName, int prior)
     stack = NULL;
     status = JUST_CREATED;
     priority = prior;
+    CPUBurst = 0;
+    totalWait = 0;
+    burstSnapshot = 0;
+    waitSnapshot = 0;
+    scheduler->totalThreads++;
 #ifdef USER_PROGRAM
     space = NULL;
     stateRestored = true;
@@ -220,7 +225,17 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
     threadToBeDestroyed = currentThread;
 
     NachOSThread *nextThread;
-
+    currentThread->CPUBurst = stats->totalTicks - currentThread->burstSnapshot;
+    scheduler->busyTime += currentThread->CPUBurst;
+    if (currentThread->CPUBurst != 0) {
+        scheduler->nonZeroBurst++;
+        if (currentThread->CPUBurst < scheduler->minBurst) {
+            scheduler->minBurst = currentThread->CPUBurst;
+        }
+    }
+    if (currentThread->CPUBurst > scheduler->maxBurst) {
+        scheduler->maxBurst = currentThread->CPUBurst;
+    }
     status = BLOCKED;
 
     // Set exit code in parent's structure provided the parent hasn't exited
@@ -273,8 +288,20 @@ NachOSThread::YieldCPU ()
     
     nextThread = scheduler->SelectNextReadyThread();
     if (nextThread != NULL) {
-	scheduler->MoveThreadToReadyQueue(this);
-	scheduler->ScheduleThread(nextThread);
+        currentThread->CPUBurst = stats->totalTicks - currentThread->burstSnapshot;
+        scheduler->busyTime += currentThread->CPUBurst;
+        if (currentThread->CPUBurst != 0) {
+            scheduler->nonZeroBurst++;
+            if (currentThread->CPUBurst < scheduler->minBurst) {
+                scheduler->minBurst = currentThread->CPUBurst;
+            }
+        }
+        if (currentThread->CPUBurst > scheduler->maxBurst) {
+            scheduler->maxBurst = currentThread->CPUBurst;
+        }
+
+        scheduler->MoveThreadToReadyQueue(this);
+        scheduler->ScheduleThread(nextThread);
     }
     (void) interrupt->SetLevel(oldLevel);
 }
@@ -307,6 +334,17 @@ NachOSThread::PutThreadToSleep ()
     ASSERT(interrupt->getLevel() == IntOff);
     
     DEBUG('t', "Sleeping thread \"%s\" with pid %d\n", getName(), pid);
+    currentThread->CPUBurst = stats->totalTicks - currentThread->burstSnapshot;
+    scheduler->busyTime += currentThread->CPUBurst;
+    if (currentThread->CPUBurst != 0) {
+        scheduler->nonZeroBurst++;
+        if (currentThread->CPUBurst < scheduler->minBurst) {
+            scheduler->minBurst = currentThread->CPUBurst;
+        }
+    }
+    if (currentThread->CPUBurst > scheduler->maxBurst) {
+        scheduler->maxBurst = currentThread->CPUBurst;
+    }
 
     status = BLOCKED;
     while ((nextThread = scheduler->SelectNextReadyThread()) == NULL)
