@@ -175,7 +175,6 @@ main(int argc, char **argv)
                         delete executable;
                     }
                 }
-                delete jobs;
                 delete buffer;
             }
         }
