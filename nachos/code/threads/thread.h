@@ -134,6 +134,7 @@ class NachOSThread {
 
     void IncInstructionCount();
     unsigned GetInstructionCount();
+    int priority;
 
   private:
     // some of the private data for this class is listed above
@@ -143,7 +144,6 @@ class NachOSThread {
 					// (If NULL, don't deallocate stack)
     ThreadStatus status;		// ready, running or blocked
     char* name;
-    int priority;
 
     int pid, ppid;			// My pid and my parent's pid
 
