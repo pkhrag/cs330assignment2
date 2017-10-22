@@ -141,44 +141,47 @@ main(int argc, char **argv)
                         count++;
                 }
 
-                char* jobs[count];
-                int priority[count];
+                char* jobs;
+                int priority;
                 NachOSThread* Threads; 
 
                 for (int i = 0, ptr = 0; i < count && ptr < length; i++) {
-                    jobs[i] = new char[length/count];
-                    sscanf(buffer + ptr, "%s", jobs[i]);
-                    printf("%s ", jobs[i]);
-                    ptr += strlen(jobs[i]);
+                    jobs = new char[100];
+                    sscanf(buffer + ptr, "%s", jobs);
+                    printf("%s ", jobs);
+                    ptr += strlen(jobs);
                     if (buffer[ptr] == '\n') {
                         ptr++;
-                        priority[i] = 100;
+                        priority = 100;
                     }
                     else {
                         ptr++;
-                        priority[i] = 0;
+                        priority = 0;
                         while(buffer[ptr] != '\n'){
-                            priority[i]*=10;
-                            priority[i]+=buffer[ptr]-'0';
+                            priority*=10;
+                            priority+=buffer[ptr]-'0';
                             ptr++;
                         }
                         ptr++;
                     }
-                    printf("%d\n", priority[i]);
-                    executable = fileSystem->Open(jobs[i]);
+                    delete jobs;
+                    printf("%d\n", priority);
+                    executable = fileSystem->Open(jobs);
 
                     if (executable == NULL) {
-                        printf("Unable to open file %s\n", jobs[i]);
+                        printf("Unable to open file %s\n", jobs);
                     }
                     else{
-                        Threads = new NachOSThread(jobs[i]);
+                        Threads = new NachOSThread(jobs);
                         Threads->space = new ProcessAddressSpace(executable);
                         Threads->space->InitUserModeCPURegisters();		// set the initial register values
                         Threads->SaveUserState();
                         Threads->CreateThreadStack (ThreadStartFunction, 0);     // Make it ready for a later context switch
                         Threads->Schedule ();
+                        delete executable;
                     }
                 }
+                delete buffer;
             }
             scheduler->Print();
             printf("chutiya\n");
@@ -217,6 +220,7 @@ main(int argc, char **argv)
 #endif // NETWORK
     }
 
+    exitThreadArray[currentThread->GetPID()] = true;
     currentThread->FinishThread();	// NOTE: if the procedure "main" 
 				// returns, then the program "nachos"
 				// will exit (as any other normal program
