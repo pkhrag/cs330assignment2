@@ -322,6 +322,9 @@ NachOSThread::YieldCPU ()
         scheduler->MoveThreadToReadyQueue(this);
         scheduler->ScheduleThread(nextThread);
     }
+    else
+        currentThread->burstSnapshot = stats->totalTicks;
+        
     (void) interrupt->SetLevel(oldLevel);
 }
 

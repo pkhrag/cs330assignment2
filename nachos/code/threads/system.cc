@@ -77,8 +77,13 @@ TimerInterruptHandler(int dummy)
            delete ptr;
         }
         //printf("[%d] Timer interrupt.\n", stats->totalTicks);
-        if(scheduler->algo != 1 && scheduler->algo != 2)
-            interrupt->YieldOnReturn();
+        if(scheduler->algo != 1 && scheduler->algo != 2){
+            if (stats->totalTicks - currentThread->burstSnapshot >= scheduler->quanta) {
+                //scheduler->Print();
+                DEBUG('k', "[PID: %d]Timer interrupt at CPU burst: %d\n",currentThread->GetPID(), stats->totalTicks - currentThread->burstSnapshot);
+                interrupt->YieldOnReturn();
+            }
+        }
     }
 }
 

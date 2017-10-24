@@ -38,6 +38,7 @@ ProcessScheduler::ProcessScheduler()
     maxBurst = 0;
     minBurst = INT_MAX;
     nonZeroBurst = 0;
+    quanta = 130;
 } 
 
 //----------------------------------------------------------------------

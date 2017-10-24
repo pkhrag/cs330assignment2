@@ -150,6 +150,18 @@ main(int argc, char **argv)
 
                 printf("algo num: %d\n", algo);
                 scheduler->algo = algo;
+                switch (algo){
+                    case 3: scheduler->quanta /= 4; break;
+                    case 4: scheduler->quanta /= 2; break;
+                    case 5: scheduler->quanta *= 3; scheduler->quanta /= 4; break;
+                    case 6: scheduler->quanta = 20; break;
+                    case 7: scheduler->quanta /= 4; break;
+                    case 8: scheduler->quanta /= 2; break;
+                    case 9: scheduler->quanta *= 3; scheduler->quanta /= 4; break;
+                    case 10: scheduler->quanta = 130; break;
+                    default: scheduler->quanta = 130; break;
+                }
+                printf("Scheduling quanta: %d\n", scheduler->quanta);
                 ptr++;
                 for (int i = 0; i < count && ptr < length; i++) {
                     jobs = new char[100];
