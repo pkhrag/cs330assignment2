@@ -55,6 +55,7 @@ class Statistics {
 #define SeekTime 	500    	// time disk takes to seek past one track
 #define ConsoleTime 	100	// time to read or write one character
 #define NetworkTime 	100   	// time to send or receive one packet
-#define TimerTicks 	100    	// (average) time between timer interrupts
+#define Quanta 130
+#define TimerTicks 	(scheduler->algo == 3)?(Quanta/4):((scheduler->algo == 4)?(Quanta/2):((scheduler->algo == 5)?(3*Quanta/4):(Quanta)))    	// (average) time between timer interrupts
 
 #endif // STATS_H
