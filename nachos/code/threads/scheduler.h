@@ -36,6 +36,7 @@ class ProcessScheduler {
     int maxBurst;
     int minBurst;
     int nonZeroBurst;
+    int quanta;
 
   private:
     List *listOfReadyThreads;  		// queue of threads that are ready to run,
