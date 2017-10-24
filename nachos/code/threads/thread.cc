@@ -48,6 +48,10 @@ NachOSThread::NachOSThread(char* threadName, int prior)
     scheduler->totalThreads++;
     lastAvgBurst = 0.0;
     avgBurst = 0.0;
+
+    IOBurst = 0;
+    IOCount = 0;
+    IOSnapshot = 0;
 #ifdef USER_PROGRAM
     space = NULL;
     stateRestored = true;
@@ -175,6 +179,8 @@ NachOSThread::FinishThread ()
     ASSERT(this == currentThread);
     
     DEBUG('t', "Finishing thread \"%s\" with pid %d\n", getName(), pid);
+
+    DEBUG('o', "Thread %s is finished with IO bursts: %d and IO switches: %d\n", getName(), currentThread->IOBurst, currentThread->IOCount);
     
     threadToBeDestroyed = currentThread;
     PutThreadToSleep();					// invokes SWITCH
@@ -225,6 +231,9 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
     DEBUG('t', "Finishing thread \"%s\" with pid %d\n", getName(), pid);
 
     threadToBeDestroyed = currentThread;
+
+    DEBUG('o', "Thread %s is exited with IO bursts: %d and IO switches: %d\n", getName(), currentThread->IOBurst, currentThread->IOCount);
+
 
     NachOSThread *nextThread;
     currentThread->CPUBurst = stats->totalTicks - currentThread->burstSnapshot;
@@ -342,6 +351,9 @@ NachOSThread::PutThreadToSleep ()
     
     ASSERT(this == currentThread);
     ASSERT(interrupt->getLevel() == IntOff);
+
+    currentThread->IOSnapshot = stats->totalTicks;
+    currentThread->IOCount++;
     
     DEBUG('t', "Sleeping thread \"%s\" with pid %d\n", getName(), pid);
     currentThread->CPUBurst = stats->totalTicks - currentThread->burstSnapshot;

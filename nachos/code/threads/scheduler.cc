@@ -65,6 +65,7 @@ ProcessScheduler::MoveThreadToReadyQueue (NachOSThread *thread)
 
     thread->setStatus(READY);
     thread->waitSnapshot = stats->totalTicks;
+    thread->IOBurst += stats->totalTicks - thread->IOSnapshot;
     if (scheduler->algo == 2) {
         listOfReadyThreads->SortedInsert((void *)thread, thread->avgBurst);
     }
