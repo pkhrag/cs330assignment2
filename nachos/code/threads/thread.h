@@ -141,6 +141,9 @@ class NachOSThread {
     unsigned int totalWait;
     float avgBurst;
     float lastAvgBurst;
+    unsigned int IOBurst;
+    unsigned int IOCount;
+    unsigned int IOSnapshot;
 
   private:
     // some of the private data for this class is listed above
