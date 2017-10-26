@@ -48,7 +48,7 @@ NachOSThread::NachOSThread(char* threadName, int prior)
     scheduler->totalThreads++;
     lastAvgBurst = 0.0;
     avgBurst = 0.0;
-
+    CPUCount=0;
     IOBurst = 0;
     IOCount = 0;
     IOSnapshot = 0;
@@ -252,6 +252,18 @@ NachOSThread::Exit (bool terminateSim, int exitcode)
     currentThread->avgBurst = ((float)currentThread->CPUBurst)*0.5 + 0.5*currentThread->lastAvgBurst;
     DEBUG('s', "Exiting thread \"%s\" average burst \"%f\"\n", getName(), currentThread->avgBurst);
 
+    // Unix Scheduling
+    // Recalculating all the priority values
+    currentThread->CPUCount = (currentThread->CPUCount + currentThread->CPUBurst);
+    if(scheduler->algo >= 7 && scheduler->algo <= 10){
+        for( int i=1; i<MAX_THREAD_COUNT; ++i) {
+            if(threadArray[i]!=NULL && !exitThreadArray[i]) {
+                threadArray[i]->CPUCount /= 2;
+                threadArray[i]->priority = 120 + threadArray[i]->CPUCount/2;
+            }
+        }
+    }
+
     status = BLOCKED;
 
     // Set exit code in parent's structure provided the parent hasn't exited
@@ -302,7 +314,6 @@ NachOSThread::YieldCPU ()
     
     DEBUG('t', "Yielding thread \"%s\" with pid %d\n", getName(), pid);
     
-    nextThread = scheduler->SelectNextReadyThread();
     currentThread->CPUBurst = stats->totalTicks - currentThread->burstSnapshot;
     scheduler->busyTime += currentThread->CPUBurst;
     if (currentThread->CPUBurst != 0) {
@@ -317,6 +328,20 @@ NachOSThread::YieldCPU ()
     currentThread->lastAvgBurst = currentThread->avgBurst;
     currentThread->avgBurst = ((float)currentThread->CPUBurst)*0.5 + 0.5*currentThread->lastAvgBurst;
     DEBUG('s', "Yielding thread \"%s\" average burst \"%f\"\n", getName(), currentThread->avgBurst);
+
+    // Unix Scheduling
+    // Recalculating all the priority values
+    currentThread->CPUCount = (currentThread->CPUCount + currentThread->CPUBurst);
+    if(scheduler->algo >= 7 && scheduler->algo <= 10){
+        for( int i=1; i<MAX_THREAD_COUNT; ++i) {
+            if(threadArray[i]!=NULL && !exitThreadArray[i]) {
+                threadArray[i]->CPUCount /= 2;
+                threadArray[i]->priority = 120 + threadArray[i]->CPUCount/2;
+            }
+        }
+    }
+
+    nextThread = scheduler->SelectNextReadyThread();
 
     if (nextThread != NULL) {
         scheduler->MoveThreadToReadyQueue(this);
@@ -373,6 +398,18 @@ NachOSThread::PutThreadToSleep ()
     currentThread->lastAvgBurst = currentThread->avgBurst;
     currentThread->avgBurst = ((float)currentThread->CPUBurst)*0.5 + 0.5*currentThread->lastAvgBurst;
     DEBUG('s', "Sleeping thread \"%s\" average burst \"%f\"\n", getName(), currentThread->avgBurst);
+	
+    // Unix Scheduling
+    // Recalculating all the priority values
+    currentThread->CPUCount = (currentThread->CPUCount + currentThread->CPUBurst);
+    if(scheduler->algo >= 7 && scheduler->algo <= 10){
+        for( int i=1; i<MAX_THREAD_COUNT; ++i) {
+            if(threadArray[i]!=NULL && !exitThreadArray[i]) {
+                threadArray[i]->CPUCount /= 2;
+                threadArray[i]->priority = 120 + threadArray[i]->CPUCount/2;
+            }
+        }
+    }
 
     status = BLOCKED;
     while ((nextThread = scheduler->SelectNextReadyThread()) == NULL)

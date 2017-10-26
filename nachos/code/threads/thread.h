@@ -144,6 +144,7 @@ class NachOSThread {
     unsigned int IOBurst;
     unsigned int IOCount;
     unsigned int IOSnapshot;
+    unsigned int CPUCount;
 
   private:
     // some of the private data for this class is listed above
