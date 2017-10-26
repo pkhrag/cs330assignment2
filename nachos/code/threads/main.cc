@@ -114,6 +114,8 @@ main(int argc, char **argv)
         else if (!strcmp(*argv, "-F")){
             ASSERT(argc > 1);
             char* filename = *(argv+1);
+	    //int input = atoi(*(argv+2));
+	    //printf("Input read: %d\n", input); 
             argCount = 2;
 
             OpenFile *openFile, *executable;    
@@ -158,9 +160,10 @@ main(int argc, char **argv)
                     case 7: scheduler->quanta /= 4; break;
                     case 8: scheduler->quanta /= 2; break;
                     case 9: scheduler->quanta *= 3; scheduler->quanta /= 4; break;
-                    case 10: scheduler->quanta = 130; break;
+                    case 10: scheduler->quanta = 20; break;
                     default: scheduler->quanta = 130; break;
                 }
+		// scheduler->quanta = input;
                 printf("Scheduling quanta: %d\n", scheduler->quanta);
                 ptr++;
                 for (int i = 0; i < count && ptr < length; i++) {
@@ -170,7 +173,7 @@ main(int argc, char **argv)
                     ptr += strlen(jobs);
                     if (buffer[ptr] == '\n') {
                         ptr++;
-                        priority = 100;
+                        priority = 70;
                     }
                     else {
                         ptr++;
@@ -181,6 +184,9 @@ main(int argc, char **argv)
                             ptr++;
                         }
                         ptr++;
+                    }
+		    if(algo>=7 && algo <=10){
+                        priority += 50;
                     }
                     printf("%d\n", priority);
                     executable = fileSystem->Open(jobs);
@@ -197,6 +203,7 @@ main(int argc, char **argv)
                         Threads->SaveUserState();
                         Threads->CreateThreadStack (ThreadStartFunction, 0);     // Make it ready for a later context switch
                         Threads->Schedule ();
+			printf("%d ",currentThread->GetPID());
                         delete executable;
                     }
                 }
